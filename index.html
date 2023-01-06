@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>drag-line-1</title>
+</head>
+
+<style>
+    #mydiv {
+        position: absolute;
+        z-index: 9;
+        background-color: #d10e0e;
+        text-align: center;
+        border: 1px solid #936565;
+        left: 200px;
+        top: 10px;
+        width: 180px;
+    }
+
+    #mydiv2 {
+        position: absolute;
+        z-index: 9;
+        background-color: #fb9090;
+        text-align: center;
+        border: 1px solid #d3d3d3;
+        width: 180px;
+        left: 200px;
+        top: 210px;
+    }
+
+    #mydivheader {
+        padding: 10px;
+        cursor: move;
+        z-index: 10;
+        background-color: #2196F3;
+        color: #fff;
+    }
+
+    #mydivheader2 {
+        padding: 10px;
+        cursor: move;
+        z-index: 10;
+        background-color: #2196F3;
+        color: #fff;
+    }
+
+    .con {
+        margin-top: 50px;
+    }
+
+    .con-title {
+        width: 100%;
+        text-align: center;
+        color: #4E4E50;
+        font-size: 40px;
+        font-weight: bold;
+    }
+
+    .org-map {
+        position: relative;
+        width: 300px;
+        height: 300px;
+        margin: 40px auto 0 auto;
+    }
+
+    .org {
+        position: absolute;
+    }
+
+    .org .org-box {
+        position: relative;
+        bottom: 0px;
+        width: 15px;
+        height: 15px;
+        border-radius: 20px;
+        background: #4E4E50;
+        transition: 0.6s;
+    }
+
+    #org1 {
+        transform: translate(-50%, 0%);
+        bottom: 80%;
+        left: 50%;
+    }
+
+    #org2 {
+        transform: translate(-50%, 0%);
+        bottom: 65%;
+        left: 20%;
+    }
+
+    #org3 {
+        transform: translate(-50%, 0%);
+        bottom: 35%;
+        left: 20%;
+    }
+
+    #org4 {
+        transform: translate(-50%, 0%);
+        bottom: 50%;
+        left: 50%;
+    }
+
+    #org5 {
+        transform: translate(-50%, 0%);
+        bottom: 65%;
+        left: 80%;
+    }
+
+    #org6 {
+        transform: translate(-50%, 0%);
+        bottom: 35%;
+        left: 80%;
+    }
+
+    #org7 {
+        transform: translate(-50%, 0%);
+        bottom: 20%;
+        left: 50%;
+    }
+
+    .org:hover .org-box {
+        background: #C3073F;
+        animation: org 1s;
+        animation-fill-mode: forwards;
+    }
+</style>
+
+<body>
+    <!-- 
+        https://stackoverflow.com/questions/69773949/connect-a-line-between-2-divs
+        https://www.w3schools.com/howto/howto_js_draggable.asp <h1>Draggable <br>DIV Element</h1>-->
+
+    <div id="mydiv" class="org">
+        <div id="mydivheader">Div-1</div>
+        <p>Move</p>
+        <p>this</p>
+        <p>DIV</p>
+    </div>
+    <div id="mydiv2" class="org">
+        <div id="mydivheader2">Div-2</div>
+        <p>Move</p>
+        <p>this</p>
+        <p>DIV</p>
+    </div>
+    <svg width="1200" height="500" id="lines">
+        <line id="line1" />
+        <line id="line2" />
+    </svg>
+    <script>
+        //Make the DIV element draggagle:
+        dragElement(document.getElementById("mydiv"));
+        dragElement(document.getElementById("mydiv2"));
+
+        function dragElement(elmnt) {
+            var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            if (document.getElementById(elmnt.id + "header")) {
+                /* if present, the header is where you move the DIV from:
+                если он присутствует, заголовок — это место, откуда вы перемещаете DIV:*/
+                document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
+            } else {
+                /* otherwise, move the DIV from anywhere inside the DIV:
+                в противном случае переместите DIV из любого места внутри DIV:*/
+                elmnt.onmousedown = dragMouseDown;
+            }
+
+            function dragMouseDown(e) {
+                e = e || window.event;
+                e.preventDefault();
+                // get the mouse cursor position at startup:
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                document.onmouseup = closeDragElement;
+                // call a function whenever the cursor moves:
+                document.onmousemove = elementDrag;
+            }
+
+            function elementDrag(e) {
+                e = e || window.event;
+                e.preventDefault();
+                // calculate the new cursor position:
+                pos1 = pos3 - e.clientX;
+                pos2 = pos4 - e.clientY;
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                // set the element's new position:
+                elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+                elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+                update();
+            }
+
+            function closeDragElement() {
+                /* stop moving when mouse button is released:*/
+                document.onmouseup = null;
+                document.onmousemove = null;
+            }
+        }
+
+        function update() {
+            let line1 = document.getElementById('line1');
+
+            let svgRect = document.getElementById('lines').getBoundingClientRect();
+
+            let rect1 = document.getElementById('mydiv').getBoundingClientRect();
+            let rect2 = document.getElementById('mydiv2').getBoundingClientRect();
+
+            let dot1x = (rect1.left + rect1.right) / 2;
+            let dot1y = (rect1.top + rect1.bottom) / 2;
+
+            let dot2x = (rect2.left + rect2.right) / 2;
+            let dot2y = (rect2.top + rect2.bottom) / 2;
+
+            setAttributes(line1, {
+                'x1': dot1x - svgRect.left,
+                'y1': dot1y - svgRect.top,
+                'x2': dot2x - svgRect.left,
+                'y2': dot2y - svgRect.top,
+                'stroke': 'red',
+                'stroke-width': 14,
+            });
+            // helper function from https://stackoverflow.com/a/12274782/6263942
+            function setAttributes(el, attrs) {
+                for (var key in attrs) {
+                    el.setAttribute(key, attrs[key]);
+                }
+            }
+        }
+        update();
+    </script>
+
+</body>
+
+</html>
